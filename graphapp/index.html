@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css">
+  <link rel="stylesheet" href="theme.css" type="text/css">
+  <style>
+  	#endpointUri {
+  		width: 80%;
+  	}
+  </style>
+  <script src="jquery-3.4.1.js"></script>
+ <!-- <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script> -->
+</head>
+<body>
+<script>
+$(document).ready(function(){
+  $("#myForm").on('submit', function(){
+    var endpointUri = $("#endpointUri").val();
+    var dataString = 'endpointUri='+ endpointUri;
+    if(endpointUri=='' || endpointUri==' ') { 
+      alert("Please Fill All Fields");
+    } else {
+    	$('#myForm').get(0).reset();
+      	$.ajax({
+        type: "POST",
+        url: "http://localhost:8080/app/add_endpoint",
+        data: dataString,
+        cache: false,
+        success: function(result){
+         // alert(result);
+         (function() {
+            $(".list-group").empty();
+            var appAPI = "http://localhost:8080/app/all_endpoints";
+            $.getJSON( appAPI)
+                .done(function( data ) {
+              $.each( data, function( i, item ) {
+                $( "<a>" ).attr("class", "list-group-item list-group-item-action").attr( "href", "graph-view.html?id="+ item.id ).text(item.endpointUri.concat(" - ").concat(item.status)).appendTo( ".list-group" );
+              });
+            });
+          })();
+          $.ajax({
+        type: "POST",
+        url: "http://localhost:8080/app/start",
+        data: dataString,
+        cache: false,
+        success: function(result){
+          alert(result);
+        }
+      });
+        }
+      });
+      	
+    } return false;
+  });
+});
+</script>
+
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container d-flex justify-content-center"> <a class="navbar-brand" href="#">
+        <i class="fa d-inline fa-lg fa-circle-o"></i>
+        <b> Endpoint Analyzer</b>
+      </a> </div>
+  </nav>
+  <div class="text-center text-md-right" style="background-image: url(https://static.pingendo.com/cover-bubble-dark.svg); background-position: right bottom;  background-size: cover; background-repeat: repeat; background-attachment: fixed;">
+    <div class="container">
+      <div class="row">
+        <div class="p-5 mx-auto mx-md-0 ml-md-auto col-10 col-md-9">
+          <h3 class="text-right display-4">Insert an endpoint to analyze</h3>
+          <form id="myForm" method="post" name="endpointUri">
+            <input id="endpointUri" name="endpointUri"/>
+            <input type="submit"/>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+<!-- <iframe name="dummyframe" id="dummyframe" style="display: none;"></iframe>
+<form method="post" name="endpointUri" action="http://localhost:8080/app/add_endpoint"  target="dummyframe"> -->
+
+
+<div id="endpoints">
+  <div class="py-5 bg-light">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+           <h2> Endpoint List:</h2>
+          <div class="list-group">     
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  var appAPI = "http://localhost:8080/app/all_endpoints";
+  $.getJSON( appAPI)
+    .done(function( data ) {
+      $.each( data, function( i, item ) {
+        $( "<a>" ).attr("class", "list-group-item list-group-item-action").attr( "href", "graph-view.html?id="+ item.id ).text(item.endpointUri.concat(" - ").concat(item.status)).appendTo( ".list-group" );
+      });
+    });
+})();
+
+</script>
+</body>
+</html>
